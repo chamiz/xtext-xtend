@@ -160,6 +160,7 @@ import com.google.inject.Inject;
  * @author Sebastian Zarnekow
  * @author Sven Efftinge
  * @author Holger Schill
+ * @author Stephane Galland
  */
 @ComposedChecks(validators = { AnnotationValidation.class })
 public class XtendValidator extends XbaseWithAnnotationsValidator {
@@ -886,14 +887,15 @@ public class XtendValidator extends XbaseWithAnnotationsValidator {
 								getDeclaratorName(conflictingOperation.getDeclaration()) + "|"
 										+ EcoreUtil.getURI(conflictingOperation.getDeclaration()).toString()
 							};
-						if (!operation.getDeclaration().isAbstract() && !conflictingOperation.getDeclaration().isAbstract()) {
+						if (!operation.getDeclaration().isAbstract() && !operation.getDeclaration().isDefault()
+							&& !conflictingOperation.getDeclaration().isAbstract() && !conflictingOperation.getDeclaration().isDefault()) {
 							error("The type " + inferredType.getSimpleName()
 									+ " inherits multiple implementations of the method " + conflictingOperation.getSimpleSignature()
 									+ " from " + getDeclaratorName(conflictingOperation.getDeclaration())
 									+ " and " + getDeclaratorName(operation.getDeclaration()) + ".",
 									xtendType, XtendPackage.Literals.XTEND_TYPE_DECLARATION__NAME,
 									CONFLICTING_DEFAULT_METHODS, uris);
-						} else {
+						} else if (!operation.getDeclaration().isDefault() && !conflictingOperation.getDeclaration().isDefault()) {
 							// At least one of the operations is non-abstract
 							IResolvedOperation abstractOp, nonabstractOp;
 							if (operation.getDeclaration().isAbstract()) {
